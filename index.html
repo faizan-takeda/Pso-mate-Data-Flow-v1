@@ -1,9 +1,1636 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My First Page</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pso Mate — Evidence, Data Flow & Story | Takeda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=DM+Sans:opsz,wght@9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F2;
+    --paper-2:#F2EDE4;
+    --ink:#14161B;
+    --ink-soft:#3A3D44;
+    --grey:#8A8478;
+    --rule:#1416151A;
+    --takeda:#E2231A;
+    --takeda-deep:#A91410;
+    --teal:#0A6E6E;
+    --teal-soft:#E4F1F1;
+    --gold:#B88A3E;
+    --sand:#EFE7D6;
+    --rose:#F2D8D5;
+    --shadow:0 1px 0 rgba(20,22,27,0.04), 0 8px 30px -12px rgba(20,22,27,0.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'DM Sans', system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  /* paper grain texture */
+  body::before{
+    content:"";
+    position:fixed;inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 0.08  0 0 0 0 0.08  0 0 0 0 0.1  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    pointer-events:none;
+    opacity:.6;
+    z-index:1;
+    mix-blend-mode:multiply;
+  }
+  main, header, footer{position:relative;z-index:2}
+
+  /* ---------- TYPE ---------- */
+  .display{font-family:'Fraunces', serif; font-weight:400; line-height:0.95; letter-spacing:-0.025em}
+  .serif-italic{font-family:'Fraunces', serif; font-style:italic; font-weight:300}
+  .mono{font-family:'JetBrains Mono', monospace; font-size:.74rem; letter-spacing:.06em; text-transform:uppercase}
+  .eyebrow{font-family:'JetBrains Mono', monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--grey)}
+  h1.display{font-size:clamp(3.5rem, 9vw, 8rem)}
+  h2.display{font-size:clamp(2.5rem, 5.5vw, 4.5rem)}
+  h3.display{font-size:clamp(1.75rem, 3vw, 2.5rem)}
+
+  /* ---------- LAYOUT ---------- */
+  section{padding:8rem 0; position:relative}
+  .container{max-width:1280px; margin:0 auto; padding:0 2.5rem}
+  .container-wide{max-width:1440px; margin:0 auto; padding:0 2.5rem}
+  .rule{height:1px; background:var(--rule); border:0}
+  .rule-takeda{height:3px; background:var(--takeda); border:0; width:64px}
+
+  /* ---------- TOP RIBBON / NAV ---------- */
+  .topbar{
+    position:fixed; top:0; left:0; right:0;
+    z-index:50;
+    backdrop-filter:saturate(140%) blur(12px);
+    background:rgba(250,247,242,.78);
+    border-bottom:1px solid var(--rule);
+  }
+  .topbar-inner{display:flex; justify-content:space-between; align-items:center; padding:.9rem 2.5rem}
+  .brand{display:flex; align-items:center; gap:.75rem}
+  .brand-mark{width:24px;height:24px;background:var(--takeda);border-radius:4px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:.8rem}
+  .brand-name{font-weight:600; letter-spacing:-.01em}
+  .nav-links{display:flex; gap:1.75rem}
+  .nav-links a{color:var(--ink); text-decoration:none; font-size:.85rem}
+  .nav-links a:hover{color:var(--takeda)}
+  .pill{display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .8rem; border:1px solid var(--rule); border-radius:999px; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; font-family:'JetBrains Mono',monospace}
+  .pill .dot{width:6px;height:6px;border-radius:999px;background:var(--takeda)}
+
+  /* ---------- COVER ---------- */
+  .cover{
+    min-height:100vh;
+    padding-top:8rem;
+    display:flex; align-items:center;
+    background:
+      radial-gradient(60% 50% at 80% 10%, rgba(226,35,26,.06), transparent 70%),
+      radial-gradient(50% 50% at 5% 80%, rgba(10,110,110,.06), transparent 70%),
+      var(--paper);
+    overflow:hidden;
+  }
+  .cover-grid{display:grid; grid-template-columns: 1.3fr 1fr; gap:5rem; align-items:end}
+  .cover-tag{display:flex; gap:1rem; align-items:center; margin-bottom:2rem}
+  .cover-tag .ribbon{background:var(--takeda); color:#fff; padding:.35rem .8rem; font-size:.7rem; letter-spacing:.18em; font-family:'JetBrains Mono',monospace; text-transform:uppercase; transform:rotate(-2deg)}
+  .cover h1 .accent{color:var(--takeda); font-style:italic; font-weight:300}
+  .cover-sub{margin-top:2.5rem; max-width:560px; font-size:1.15rem; color:var(--ink-soft); line-height:1.6}
+  .cover-meta{display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:3.5rem; padding-top:2rem; border-top:1px solid var(--rule)}
+  .cover-meta .item .lbl{font-family:'JetBrains Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--grey); margin-bottom:.4rem}
+  .cover-meta .item .val{font-family:'Fraunces',serif; font-size:1.25rem; font-weight:400}
+  .cover-illu{position:relative; height:520px}
+
+  /* ---------- INTRO/CONTEXT ---------- */
+  .context-grid{display:grid; grid-template-columns: 1fr 1.4fr; gap:5rem; align-items:start}
+  .context-grid .lead{font-family:'Fraunces',serif; font-size:1.6rem; line-height:1.4; color:var(--ink); font-weight:300}
+  .context-grid .lead strong{font-weight:500; background:linear-gradient(180deg, transparent 60%, rgba(226,35,26,.18) 60%)}
+  .context-points{display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1.5rem}
+  .ctx-card{padding:1.5rem; border:1px solid var(--rule); background:#fff; border-radius:6px}
+  .ctx-card .num{font-family:'Fraunces',serif; font-size:2rem; color:var(--takeda); line-height:1}
+  .ctx-card h4{margin:.5rem 0 .35rem; font-size:.95rem}
+  .ctx-card p{font-size:.88rem; color:var(--ink-soft)}
+
+  /* ---------- AT A GLANCE ---------- */
+  .glance-wrap{background:var(--ink); color:#F8F2E5; padding:7rem 0; position:relative; overflow:hidden}
+  .glance-wrap::before{content:""; position:absolute; inset:0; background:radial-gradient(60% 60% at 50% 0%, rgba(226,35,26,.18), transparent 70%); pointer-events:none}
+  .glance-wrap .eyebrow{color:#9c9588}
+  .glance-wrap h2{color:#F8F2E5}
+  .glance-grid{display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:3rem; position:relative}
+  .ev-card{
+    padding:2.5rem;
+    border:1px solid #2a2d34;
+    border-radius:8px;
+    background:linear-gradient(180deg, #1d2027, #16181e);
+    position:relative;
+    overflow:hidden;
+  }
+  .ev-card .ev-num{font-family:'Fraunces',serif; font-size:6rem; line-height:.8; color:transparent; -webkit-text-stroke:1px #4a4d54; position:absolute; top:1rem; right:1.5rem; opacity:.7}
+  .ev-card .ev-tag{display:inline-block; padding:.35rem .7rem; background:rgba(226,35,26,.15); color:#FF6961; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase}
+  .ev-card h3{font-family:'Fraunces',serif; font-size:2rem; line-height:1.1; margin-top:1rem; font-weight:400}
+  .ev-card .ev-q{font-style:italic; color:#c5bdad; margin-top:1rem; font-family:'Fraunces',serif; font-size:1.1rem; line-height:1.4}
+  .ev-card ul{list-style:none; margin-top:2rem; display:grid; gap:.6rem}
+  .ev-card li{font-size:.88rem; color:#cfc8b8; display:flex; gap:.7rem; align-items:flex-start}
+  .ev-card li::before{content:""; width:4px; height:4px; border-radius:999px; background:var(--takeda); margin-top:.6rem; flex-shrink:0}
+
+  /* ---------- EVIDENCE SECTIONS ---------- */
+  .ev-section{padding:9rem 0; position:relative}
+  .ev-section.alt{background:linear-gradient(180deg, var(--paper) 0%, var(--sand) 100%)}
+  .ev-header{display:grid; grid-template-columns: 0.6fr 1.4fr; gap:4rem; align-items:end; margin-bottom:5rem}
+  .ev-mega{font-family:'Fraunces',serif; font-size:clamp(8rem, 22vw, 22rem); line-height:.8; color:transparent; -webkit-text-stroke:1.5px var(--takeda); font-weight:300; letter-spacing:-.03em}
+  .ev-claim{font-family:'Fraunces',serif; font-size:clamp(1.8rem,3vw,2.6rem); line-height:1.2; color:var(--ink); font-weight:300}
+  .ev-claim em{color:var(--takeda); font-style:italic}
+
+  /* ---------- DATA POINTS ---------- */
+  .datapoints{margin-top:1rem}
+  .dp-header{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1.5rem; padding-bottom:1rem; border-bottom:1px solid var(--rule)}
+  .dp-header h3{font-family:'Fraunces',serif; font-size:2rem; font-weight:400}
+  .dp-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:1rem}
+  .dp{
+    padding:1.5rem 1.25rem;
+    border-radius:6px;
+    background:#fff;
+    border:1px solid var(--rule);
+    transition:transform .3s ease, box-shadow .3s ease;
+    position:relative;
+    min-height:170px;
+  }
+  .dp:hover{transform:translateY(-2px); box-shadow:var(--shadow)}
+  .dp .icon{width:32px;height:32px;display:grid;place-items:center;background:var(--rose); border-radius:6px; margin-bottom:.9rem}
+  .dp.passive .icon{background:var(--teal-soft)}
+  .dp .icon svg{width:18px;height:18px}
+  .dp h4{font-size:.95rem; line-height:1.25; font-weight:600; margin-bottom:.4rem}
+  .dp p{font-size:.78rem; color:var(--ink-soft); line-height:1.45}
+  .dp .badge{position:absolute; top:1rem; right:1rem; font-family:'JetBrains Mono',monospace; font-size:.6rem; letter-spacing:.12em; color:var(--grey); text-transform:uppercase}
+
+  /* ---------- DATA FLOW DIAGRAM SVG WRAPPER ---------- */
+  .flow-wrap{margin-top:5rem}
+  .flow-card{
+    background:#fff;
+    border-radius:12px;
+    border:1px solid var(--rule);
+    padding:2.5rem;
+    box-shadow:var(--shadow);
+  }
+  .flow-card svg{width:100%; height:auto; display:block}
+  .flow-legend{display:flex; flex-wrap:wrap; gap:1.5rem; margin-top:2rem; padding-top:2rem; border-top:1px solid var(--rule)}
+  .leg-item{display:flex; align-items:center; gap:.55rem; font-size:.78rem; color:var(--ink-soft)}
+  .leg-swatch{width:14px;height:14px;border-radius:3px}
+
+  /* ---------- PRIVACY MATRIX ---------- */
+  .privacy{margin-top:4rem}
+  .priv-grid{display:grid; grid-template-columns: 1fr 1fr; gap:2.5rem; align-items:start}
+  .priv-table{background:#fff; border:1px solid var(--rule); border-radius:8px; overflow:hidden}
+  .priv-table table{width:100%; border-collapse:collapse}
+  .priv-table th, .priv-table td{padding:.95rem 1.1rem; text-align:left; border-bottom:1px solid var(--rule); font-size:.85rem; vertical-align:top}
+  .priv-table th{background:var(--paper-2); font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); font-weight:500}
+  .priv-table td.who{font-weight:600}
+  .priv-table .access-yes{color:var(--teal); font-weight:600}
+  .priv-table .access-aggr{color:var(--gold); font-weight:600}
+  .priv-table .access-no{color:var(--grey)}
+  .priv-promise{padding:2.5rem; background:var(--ink); color:var(--paper); border-radius:8px; position:relative; overflow:hidden}
+  .priv-promise::before{content:""; position:absolute; inset:0; background:radial-gradient(50% 50% at 100% 0%, rgba(10,110,110,.25), transparent 70%)}
+  .priv-promise *{position:relative}
+  .priv-promise .eyebrow{color:#9c9588; margin-bottom:1rem}
+  .priv-promise h4{font-family:'Fraunces',serif; font-size:1.6rem; line-height:1.2; font-weight:400; margin-bottom:1.5rem}
+  .priv-promise ul{list-style:none; display:grid; gap:1rem}
+  .priv-promise li{display:flex; gap:.8rem; font-size:.88rem; color:#d3ccbd}
+  .priv-promise li svg{flex-shrink:0; margin-top:.15rem}
+  .priv-promise li strong{color:#fff; display:block; margin-bottom:.1rem}
+
+  /* ---------- LOC VALUE ---------- */
+  .loc{margin-top:5rem}
+  .loc-header{margin-bottom:2.5rem}
+  .loc-header h3{font-family:'Fraunces',serif; font-size:2.2rem; font-weight:400; line-height:1.1}
+  .loc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem}
+  .loc-card{padding:2rem; border-radius:8px; min-height:280px; position:relative; overflow:hidden; display:flex; flex-direction:column}
+  .loc-card.care{background:linear-gradient(150deg, #FFF1EF, #FFE4E0)}
+  .loc-card.tech{background:linear-gradient(150deg, #E9F4F4, #D4ECEC)}
+  .loc-card.biz{background:linear-gradient(150deg, #F4ECD8, #EADFBF)}
+  .loc-card .loc-num{font-family:'Fraunces',serif; font-size:5rem; line-height:.8; color:rgba(20,22,27,.08); position:absolute; top:1rem; right:1.5rem}
+  .loc-card .loc-cat{font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--ink-soft)}
+  .loc-card h4{font-family:'Fraunces',serif; font-size:1.5rem; font-weight:400; margin:.5rem 0 1rem; line-height:1.15; color:var(--ink)}
+  .loc-card p{font-size:.88rem; color:var(--ink-soft); line-height:1.55}
+  .loc-card .metric{margin-top:auto; padding-top:1.25rem; border-top:1px dashed rgba(20,22,27,.18)}
+  .loc-card .metric .v{font-family:'Fraunces',serif; font-size:1.6rem; color:var(--ink); font-weight:500}
+  .loc-card .metric .l{font-size:.72rem; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; letter-spacing:.1em; text-transform:uppercase}
+
+  /* ---------- THE STORY ---------- */
+  .story{margin-top:6rem; position:relative}
+  .story-intro{display:grid; grid-template-columns:1fr 1.4fr; gap:4rem; align-items:start; margin-bottom:4rem}
+  .story-intro .label{position:relative}
+  .story-intro .label .big{font-family:'Fraunces',serif; font-style:italic; font-size:5rem; line-height:.9; color:var(--takeda); font-weight:300}
+  .story-intro .label .sub{margin-top:.8rem; font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--grey)}
+  .story-intro .lead{font-family:'Fraunces',serif; font-size:1.5rem; line-height:1.4; color:var(--ink); font-weight:300}
+  .story-intro .lead strong{font-weight:500}
+
+  /* E1 STORY: timeline */
+  .timeline{position:relative; padding:2rem 0}
+  .timeline-track{
+    position:absolute; left:5%; right:5%; top:50%;
+    height:2px;
+    background:linear-gradient(90deg, var(--rose), var(--takeda) 50%, var(--teal));
+    transform:translateY(-50%);
+  }
+  .timeline-track::after{
+    content:""; position:absolute; right:-6px; top:-5px;
+    width:0;height:0; border-left:10px solid var(--teal); border-top:6px solid transparent; border-bottom:6px solid transparent;
+  }
+  .timeline-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:1rem; position:relative}
+  .tl-node{display:flex; flex-direction:column; align-items:center; gap:1rem; position:relative}
+  .tl-node .dot{
+    width:60px; height:60px; border-radius:999px;
+    background:#fff; border:2px solid var(--takeda);
+    display:grid; place-items:center;
+    font-family:'Fraunces',serif; font-size:1.1rem; color:var(--takeda); font-weight:500;
+    box-shadow:var(--shadow);
+    z-index:2;
+  }
+  .tl-node:nth-child(1) .dot{border-color:#F4A09B}
+  .tl-node:nth-child(5) .dot{border-color:var(--teal); color:var(--teal)}
+  .tl-card{
+    background:#fff; padding:1.25rem; border-radius:8px; border:1px solid var(--rule);
+    text-align:center; width:100%;
+    box-shadow:0 4px 16px -8px rgba(0,0,0,.08);
+  }
+  .tl-card .lbl{font-family:'JetBrains Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--grey); margin-bottom:.4rem}
+  .tl-card .val{font-family:'Fraunces',serif; font-size:1.5rem; font-weight:500; line-height:1; color:var(--ink); margin-bottom:.4rem}
+  .tl-card .val .unit{font-size:.8rem; color:var(--grey)}
+  .tl-card .desc{font-size:.78rem; color:var(--ink-soft); line-height:1.4}
+  .tl-position{position:absolute; left:50%; transform:translateX(-50%); top:-2.5rem; font-family:'JetBrains Mono',monospace; font-size:.65rem; letter-spacing:.12em; color:var(--grey); white-space:nowrap}
+
+  .insight-box{
+    margin-top:4rem; padding:3rem;
+    background:#fff;
+    border-radius:8px;
+    border:1px solid var(--rule);
+    border-left:4px solid var(--takeda);
+    display:grid; grid-template-columns: 1fr 2fr; gap:3rem; align-items:center;
+  }
+  .insight-box .lbl{font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; color:var(--takeda); margin-bottom:.8rem}
+  .insight-box h4{font-family:'Fraunces',serif; font-size:1.6rem; line-height:1.2; font-weight:400}
+  .insight-box .quote{font-family:'Fraunces',serif; font-style:italic; font-size:1.4rem; line-height:1.5; color:var(--ink); font-weight:300}
+  .insight-box .quote::before{content:"“"; font-size:3rem; color:var(--takeda); line-height:0; vertical-align:-0.4em; margin-right:.2em}
+
+  /* E2 STORY: web of connections */
+  .web-section{display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start}
+  .web-viz{background:#fff; border-radius:12px; border:1px solid var(--rule); padding:1.5rem; box-shadow:var(--shadow)}
+  .web-viz svg{width:100%; height:auto}
+  .web-narrative h4{font-family:'Fraunces',serif; font-size:1.5rem; font-weight:400; margin-bottom:1.25rem}
+  .narr-step{
+    display:grid; grid-template-columns: 32px 1fr; gap:1rem; align-items:start;
+    padding:1.25rem 0; border-bottom:1px dashed var(--rule);
+  }
+  .narr-step:last-child{border-bottom:0}
+  .narr-step .nstep{
+    width:30px;height:30px;
+    border-radius:999px; border:1.5px solid var(--takeda); color:var(--takeda);
+    display:grid; place-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:.78rem; font-weight:500;
+    background:#fff;
+  }
+  .narr-step h5{font-family:'Fraunces',serif; font-size:1.1rem; line-height:1.2; font-weight:500; margin-bottom:.25rem}
+  .narr-step p{font-size:.85rem; color:var(--ink-soft); line-height:1.5}
+  .narr-step .data-tag{display:inline-block; margin-top:.4rem; font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.1em; padding:.2rem .5rem; background:var(--teal-soft); color:var(--teal); border-radius:3px; text-transform:uppercase}
+
+  /* HCP summary mock */
+  .hcp-summary{
+    margin-top:4rem; background:linear-gradient(180deg, #fff, var(--paper-2));
+    border-radius:8px; padding:2.5rem;
+    border:1px solid var(--rule); box-shadow:var(--shadow);
+  }
+  .hcp-head{display:flex; justify-content:space-between; align-items:center; padding-bottom:1.25rem; border-bottom:1px solid var(--rule); margin-bottom:1.5rem}
+  .hcp-head .left{display:flex; align-items:center; gap:1rem}
+  .hcp-head .avatar{width:42px;height:42px;border-radius:999px;background:var(--takeda);color:#fff;display:grid;place-items:center;font-family:'Fraunces',serif;font-weight:500}
+  .hcp-head .who{font-size:.85rem; color:var(--ink-soft)}
+  .hcp-head .who b{color:var(--ink); font-weight:600}
+  .hcp-head .stamp{font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.12em; color:var(--teal); text-transform:uppercase; padding:.35rem .7rem; background:var(--teal-soft); border-radius:4px}
+  .hcp-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem}
+  .hcp-stat{padding:1rem; background:#fff; border-radius:6px; border:1px solid var(--rule)}
+  .hcp-stat .l{font-family:'JetBrains Mono',monospace; font-size:.62rem; letter-spacing:.12em; color:var(--grey); text-transform:uppercase; margin-bottom:.4rem}
+  .hcp-stat .v{font-family:'Fraunces',serif; font-size:1.5rem; font-weight:500}
+  .hcp-stat .t{font-size:.72rem; color:var(--teal); margin-top:.2rem}
+  .hcp-stat .t.warn{color:var(--takeda)}
+  .hcp-insight{padding:1.25rem; background:#fff; border-radius:6px; border:1px solid var(--rule); border-left:3px solid var(--takeda)}
+  .hcp-insight .l{font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.14em; color:var(--takeda); text-transform:uppercase; margin-bottom:.5rem}
+  .hcp-insight p{font-family:'Fraunces',serif; font-size:1.1rem; line-height:1.4; color:var(--ink); font-weight:300}
+  .hcp-insight p strong{font-weight:500; background:linear-gradient(180deg,transparent 60%, rgba(226,35,26,.18) 60%)}
+
+  /* ---------- ASK / CLOSING ---------- */
+  .closing{padding:9rem 0; background:linear-gradient(180deg, var(--paper) 0%, #f0e9d9 100%); position:relative}
+  .closing-grid{display:grid; grid-template-columns: 1fr 1.2fr; gap:5rem; align-items:start}
+  .ask-list{display:grid; gap:1rem}
+  .ask{
+    display:grid; grid-template-columns: 60px 1fr;
+    gap:1.5rem; padding:1.5rem 0;
+    border-bottom:1px solid var(--rule);
+  }
+  .ask .num{font-family:'Fraunces',serif; font-size:2.5rem; line-height:.9; color:var(--takeda); font-weight:300}
+  .ask h5{font-family:'Fraunces',serif; font-size:1.25rem; font-weight:500; margin-bottom:.4rem}
+  .ask p{font-size:.9rem; color:var(--ink-soft); line-height:1.55}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:3rem 0; background:var(--ink); color:#cfc8b8}
+  .footer-inner{display:flex; justify-content:space-between; align-items:center}
+  .footer-inner .mono{color:#9c9588}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:980px){
+    .cover-grid, .context-grid, .priv-grid, .web-section, .closing-grid, .insight-box{grid-template-columns:1fr; gap:3rem}
+    .glance-grid{grid-template-columns:1fr}
+    .dp-grid{grid-template-columns:1fr 1fr}
+    .loc-grid{grid-template-columns:1fr}
+    .timeline-grid{grid-template-columns:1fr; gap:2rem}
+    .timeline-track{display:none}
+    .ev-header{grid-template-columns:1fr; gap:1.5rem}
+    .ev-mega{font-size:8rem}
+    .nav-links{display:none}
+    .hcp-grid{grid-template-columns:1fr 1fr}
+    .context-points{grid-template-columns:1fr}
+  }
+
+  /* entrance animations */
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(24px)}
+    to{opacity:1; transform:translateY(0)}
+  }
+  .reveal{opacity:0; animation:riseIn .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .reveal.d1{animation-delay:.15s}
+  .reveal.d2{animation-delay:.3s}
+  .reveal.d3{animation-delay:.45s}
+  .reveal.d4{animation-delay:.6s}
+</style>
 </head>
 <body>
-    <h1>Hello World</h1>
+
+<!-- ============= TOP RIBBON ============= -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">T</div>
+      <div>
+        <div class="brand-name">Takeda × Pso Mate</div>
+        <div class="mono" style="color:var(--grey); font-size:.62rem">Evidence Strategy · Internal Working Doc</div>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="#context">Context</a>
+      <a href="#glance">At a Glance</a>
+      <a href="#e1">E1 · Adherence</a>
+      <a href="#e2">E2 · Symptom Tracking</a>
+      <a href="#ask">The Ask</a>
+    </nav>
+    <div class="pill"><span class="dot"></span> Leadership Review</div>
+  </div>
+</header>
+
+<!-- ============= COVER ============= -->
+<section class="cover" id="cover">
+  <div class="container-wide cover-grid">
+    <div>
+      <div class="cover-tag">
+        <span class="ribbon">Evidence · Data · Story</span>
+        <span class="mono" style="color:var(--grey)">v2.0 · Working Draft</span>
+      </div>
+      <h1 class="display reveal">
+        Two evidences.<br>
+        Two data flows.<br>
+        <span class="accent">Two stories</span> worth telling.
+      </h1>
+      <p class="cover-sub reveal d2">
+        How Pso Mate quietly turns daily friction — a missed reminder, a sleepless night, a
+        flare on a Wednesday — into <em style="font-family:Fraunces,serif">evidence the LOC, the HCP and the patient can all act on.</em>
+      </p>
+      <div class="cover-meta reveal d3">
+        <div class="item"><div class="lbl">Scope</div><div class="val">E1 + E2 only</div></div>
+        <div class="item"><div class="lbl">Audience</div><div class="val">Leadership · LOC</div></div>
+        <div class="item"><div class="lbl">Purpose</div><div class="val">Decide &amp; Endorse</div></div>
+      </div>
+    </div>
+    <!-- COVER ILLUSTRATION -->
+    <div class="cover-illu reveal d2">
+      <svg viewBox="0 0 480 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+        <defs>
+          <linearGradient id="phoneGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#FAF7F2"/>
+            <stop offset="100%" stop-color="#EFE7D6"/>
+          </linearGradient>
+          <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff"/>
+            <stop offset="100%" stop-color="#FFF1EF"/>
+          </linearGradient>
+          <filter id="soft">
+            <feGaussianBlur stdDeviation="20"/>
+          </filter>
+        </defs>
+        <!-- soft background blob -->
+        <ellipse cx="240" cy="260" rx="220" ry="220" fill="#E2231A" opacity=".06" filter="url(#soft)"/>
+        <ellipse cx="380" cy="180" rx="80" ry="80" fill="#0A6E6E" opacity=".08" filter="url(#soft)"/>
+
+        <!-- decorative dotted circle -->
+        <circle cx="240" cy="260" r="200" fill="none" stroke="#1416151A" stroke-dasharray="2 6"/>
+        <circle cx="240" cy="260" r="150" fill="none" stroke="#1416151A" stroke-dasharray="2 6"/>
+
+        <!-- Phone -->
+        <g transform="translate(140,80)">
+          <rect x="0" y="0" width="200" height="380" rx="28" fill="#14161B"/>
+          <rect x="6" y="6" width="188" height="368" rx="22" fill="url(#screenGrad)"/>
+          <!-- notch -->
+          <rect x="80" y="14" width="40" height="6" rx="3" fill="#14161B" opacity=".25"/>
+
+          <!-- App header -->
+          <text x="20" y="50" font-family="JetBrains Mono" font-size="8" letter-spacing="1.5" fill="#8A8478">PSO MATE · TODAY</text>
+          <text x="20" y="78" font-family="Fraunces" font-size="20" fill="#14161B">Hello, Lina</text>
+          <text x="20" y="96" font-family="Fraunces" font-size="11" fill="#8A8478" font-style="italic">Day 47 · Week 7</text>
+
+          <!-- Adherence card -->
+          <rect x="14" y="115" width="172" height="70" rx="10" fill="#fff" stroke="#1416151A"/>
+          <text x="26" y="135" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">DOSE TODAY</text>
+          <text x="26" y="158" font-family="Fraunces" font-size="20" fill="#14161B">8:00 AM</text>
+          <circle cx="160" cy="150" r="14" fill="#0A6E6E"/>
+          <path d="M154 150 l5 5 l9 -10" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="26" y="172" font-family="DM Sans" font-size="7" fill="#0A6E6E">Confirmed · 92% this week</text>
+
+          <!-- Symptom card -->
+          <rect x="14" y="195" width="172" height="80" rx="10" fill="#fff" stroke="#1416151A"/>
+          <text x="26" y="215" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">ITCH · LAST 7 DAYS</text>
+
+          <!-- mini chart -->
+          <polyline points="26,260 46,250 66,255 86,235 106,240 126,225 146,232 166,222"
+            fill="none" stroke="#E2231A" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="166" cy="222" r="3" fill="#E2231A"/>
+          <text x="26" y="270" font-family="DM Sans" font-size="7" fill="#8A8478">Trending down · ↓ 31%</text>
+
+          <!-- Photo card -->
+          <rect x="14" y="285" width="172" height="60" rx="10" fill="#FFF1EF" stroke="#F4A09B"/>
+          <rect x="24" y="295" width="40" height="40" rx="6" fill="#E2231A" opacity=".25"/>
+          <text x="74" y="310" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">VISIT IN 5 DAYS</text>
+          <text x="74" y="325" font-family="Fraunces" font-size="10" fill="#14161B">Summary ready</text>
+          <text x="74" y="338" font-family="DM Sans" font-size="7" fill="#8A8478">Tap to preview →</text>
+        </g>
+
+        <!-- floating data tags -->
+        <g transform="translate(20,120)">
+          <rect width="120" height="30" rx="15" fill="#fff" stroke="#1416151A"/>
+          <circle cx="16" cy="15" r="4" fill="#E2231A"/>
+          <text x="28" y="19" font-family="JetBrains Mono" font-size="8" fill="#14161B">DOSE LOGGED</text>
+        </g>
+        <g transform="translate(340,110)">
+          <rect width="120" height="30" rx="15" fill="#fff" stroke="#1416151A"/>
+          <circle cx="16" cy="15" r="4" fill="#0A6E6E"/>
+          <text x="28" y="19" font-family="JetBrains Mono" font-size="8" fill="#14161B">SLEEP · 6.2H</text>
+        </g>
+        <g transform="translate(20,420)">
+          <rect width="140" height="30" rx="15" fill="#fff" stroke="#1416151A"/>
+          <circle cx="16" cy="15" r="4" fill="#B88A3E"/>
+          <text x="28" y="19" font-family="JetBrains Mono" font-size="8" fill="#14161B">TRIGGER · STRESS</text>
+        </g>
+        <g transform="translate(330,400)">
+          <rect width="130" height="30" rx="15" fill="#fff" stroke="#1416151A"/>
+          <circle cx="16" cy="15" r="4" fill="#E2231A"/>
+          <text x="28" y="19" font-family="JetBrains Mono" font-size="8" fill="#14161B">ITCH · 4/10</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============= CONTEXT ============= -->
+<section id="context">
+  <div class="container">
+    <div class="context-grid">
+      <div>
+        <div class="eyebrow">01 · Why this deck exists</div>
+        <hr class="rule-takeda" style="margin:1rem 0 0">
+      </div>
+      <div>
+        <p class="lead">
+          Pso Mate is a companion, not a clinic. To earn the trust of patients, HCPs and our LOCs,
+          we need <strong>evidence that is collected with consent, stored with care, and tells a
+          human story</strong> — not just a chart.
+        </p>
+        <div class="context-points">
+          <div class="ctx-card">
+            <div class="num">01</div>
+            <h4>Collect with intent</h4>
+            <p>Every data point earns its place. We capture only what proves a claim a stakeholder will block on if missing.</p>
+          </div>
+          <div class="ctx-card">
+            <div class="num">02</div>
+            <h4>Safeguard by default</h4>
+            <p>Encryption at rest, pseudonymisation in motion, and access tiers that follow the principle of least privilege.</p>
+          </div>
+          <div class="ctx-card">
+            <div class="num">03</div>
+            <h4>Translate for the LOC</h4>
+            <p>Three angles — <em>patient care, data &amp; tech, business</em> — so every LOC sees themselves in the evidence.</p>
+          </div>
+          <div class="ctx-card">
+            <div class="num">04</div>
+            <h4>Tell the story</h4>
+            <p>Numbers don't move stakeholders. Patterns do. Each evidence ends with a story the data uniquely reveals.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= AT A GLANCE ============= -->
+<section class="glance-wrap" id="glance">
+  <div class="container">
+    <div class="eyebrow">02 · At a glance</div>
+    <h2 class="display" style="margin-top:1rem; max-width:820px">Two evidences carry the entire core MVP claim.</h2>
+    <p style="max-width:680px; margin-top:1.5rem; color:#cfc8b8; font-size:1.05rem">
+      E3, E4, E5 matter — but without E1 and E2, the companion has no foundation to stand on. These two
+      are the must-prove claims for the first 12 to 16 weeks.
+    </p>
+    <div class="glance-grid">
+      <div class="ev-card">
+        <div class="ev-num">E1</div>
+        <div class="ev-tag">Behaviour · Adherence</div>
+        <h3>Adherence Support &amp; Treatment Habit</h3>
+        <p class="ev-q">"Does Pso Mate help patients stay on therapy through the critical 12–16 week window — and beyond?"</p>
+        <ul>
+          <li>Up to 50% of patients drift off therapy without a habit anchor in the first months.</li>
+          <li>Reminders, dose confirmation and onboarding are our active levers.</li>
+          <li>External validation via pharmacy refill data anchors credibility.</li>
+        </ul>
+      </div>
+      <div class="ev-card">
+        <div class="ev-num">E2</div>
+        <div class="ev-tag">Experience · Visit Readiness</div>
+        <h3>Symptom Tracking &amp; Visit Readiness</h3>
+        <p class="ev-q">"Does structured tracking turn vague memory into a clear conversation patients and HCPs can act on?"</p>
+        <ul>
+          <li>Patients see their HCP 2–4 times a year, but live with psoriasis every day.</li>
+          <li>Itch, sleep, triggers and photos build a story between visits.</li>
+          <li>Confidence and visit quality — not QoL — are our near-term claims.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= E1: ADHERENCE ============= -->
+<section class="ev-section" id="e1">
+  <div class="container-wide">
+    <div class="ev-header">
+      <div>
+        <div class="ev-mega">E1</div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:1rem">Evidence One · Adherence Support</div>
+        <p class="ev-claim">
+          We claim that Pso Mate <em>quietly turns the first sixteen weeks of therapy into a habit</em> —
+          measured by what users tap, log and refill.
+        </p>
+      </div>
+    </div>
+
+    <!-- DATA POINTS -->
+    <div class="datapoints">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">What we collect</div>
+          <h3 style="margin-top:.5rem">The seven data points that prove the claim.</h3>
+        </div>
+        <div class="mono" style="color:var(--grey)">Curated from E1 superset</div>
+      </div>
+      <div class="dp-grid">
+        <div class="dp">
+          <span class="badge">Active</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h4>Reminder engagement rate</h4>
+          <p>% of reminders opened, snoozed, or dismissed. The first signal of intent.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Active</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <h4>Dose confirmation log</h4>
+          <p>Tap-to-confirm at scheduled time, with deviation captured (early / on-time / late / missed).</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Active</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg></div>
+          <h4>Missed-dose patterns</h4>
+          <p>Day-of-week and time-of-day clustering. Where adherence breaks tells us where to intervene.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Active</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 10h6M9 14h6"/></svg></div>
+          <h4>Onboarding completion</h4>
+          <p>Did the patient finish setup? An incomplete onboarding predicts a 3× higher 12-week dropout.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Active</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg></div>
+          <h4>16-week persistence</h4>
+          <p>Did the user remain active and dosing through the critical window? Our headline metric.</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">External</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M3 7h18l-2 13H5L3 7z"/><path d="M8 7V4h8v3"/></svg></div>
+          <h4>Pharmacy refill signal</h4>
+          <p>Opt-in linkage to refill records. The objective anchor that lifts evidence from self-report to credible.</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">Derived</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></div>
+          <h4>Friction-point signal</h4>
+          <p>Pattern of late or missed doses ahead of weekend / travel — feeds proactive nudges.</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">Output</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6"/></svg></div>
+          <h4>Adherence summary</h4>
+          <p>Patient-readable monthly view + HCP visit summary. The artefact, not just the data.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA FLOW -->
+    <div class="flow-wrap">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">How the data moves</div>
+          <h3 style="margin-top:.5rem">From a single tap to insight — without ever exposing identity.</h3>
+        </div>
+        <div class="mono" style="color:var(--grey)">E1 Data Flow · Reference</div>
+      </div>
+      <div class="flow-card">
+        <svg viewBox="0 0 1240 560" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="zone-user" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFF1EF"/>
+              <stop offset="100%" stop-color="#FCE3DF"/>
+            </linearGradient>
+            <linearGradient id="zone-app" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FAF7F2"/>
+              <stop offset="100%" stop-color="#F2EDE4"/>
+            </linearGradient>
+            <linearGradient id="zone-secure" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1A2027"/>
+              <stop offset="100%" stop-color="#14161B"/>
+            </linearGradient>
+            <linearGradient id="zone-analytics" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E9F4F4"/>
+              <stop offset="100%" stop-color="#D4ECEC"/>
+            </linearGradient>
+            <linearGradient id="zone-output" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F4ECD8"/>
+              <stop offset="100%" stop-color="#EADFBF"/>
+            </linearGradient>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#14161B"/>
+            </marker>
+            <marker id="arrowR" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#E2231A"/>
+            </marker>
+            <marker id="arrowT" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#0A6E6E"/>
+            </marker>
+          </defs>
+
+          <!-- Zone 1: USER -->
+          <rect x="20" y="30" width="240" height="500" rx="14" fill="url(#zone-user)" stroke="#F4A09B" stroke-width="1"/>
+          <text x="40" y="60" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#A91410">PATIENT ZONE</text>
+          <text x="40" y="80" font-family="Fraunces" font-size="14" fill="#14161B" font-style="italic">where the data is born</text>
+
+          <!-- Phone -->
+          <g transform="translate(70,110)">
+            <rect width="140" height="220" rx="20" fill="#14161B"/>
+            <rect x="4" y="4" width="132" height="212" rx="16" fill="#fff"/>
+            <text x="14" y="30" font-family="JetBrains Mono" font-size="7" letter-spacing="1.2" fill="#8A8478">PSO MATE · 8:00 AM</text>
+            <text x="14" y="56" font-family="Fraunces" font-size="14" fill="#14161B">Time for your dose</text>
+            <rect x="14" y="68" width="112" height="40" rx="8" fill="#FFF1EF" stroke="#F4A09B"/>
+            <text x="22" y="90" font-family="DM Sans" font-size="9" fill="#14161B">Tap to confirm</text>
+            <circle cx="118" cy="88" r="8" fill="#E2231A"/>
+            <path d="M114 88 l3 3 l5 -6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <text x="14" y="135" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">REMINDER · DOSE</text>
+            <text x="14" y="148" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">ONBOARDING · MISSED</text>
+            <text x="14" y="161" font-family="JetBrains Mono" font-size="6" letter-spacing="1" fill="#8A8478">REFILL · PERSISTENCE</text>
+
+            <rect x="14" y="175" width="112" height="30" rx="6" fill="#0A6E6E" opacity=".1"/>
+            <text x="22" y="194" font-family="DM Sans" font-size="8" fill="#0A6E6E">7-day streak · keep going</text>
+          </g>
+          <text x="140" y="380" font-family="JetBrains Mono" font-size="8" letter-spacing="1.2" fill="#8A8478" text-anchor="middle">EVENTS GENERATED</text>
+          <g font-family="DM Sans" font-size="10" fill="#14161B">
+            <text x="40" y="405">• reminder.shown</text>
+            <text x="40" y="425">• reminder.tapped</text>
+            <text x="40" y="445">• dose.confirmed</text>
+            <text x="40" y="465">• onboarding.step_n</text>
+            <text x="40" y="485">• session.opened</text>
+          </g>
+
+          <!-- Arrow to security gate -->
+          <path d="M260 280 L 320 280" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+          <text x="290" y="270" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#8A8478" text-anchor="middle">TLS 1.3</text>
+
+          <!-- Zone 2: SECURE GATEWAY -->
+          <rect x="320" y="60" width="220" height="440" rx="14" fill="url(#zone-secure)"/>
+          <text x="340" y="90" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#cfc8b8">SECURE GATEWAY</text>
+          <text x="340" y="110" font-family="Fraunces" font-size="14" fill="#fff" font-style="italic">identity becomes a token</text>
+
+          <!-- shield -->
+          <g transform="translate(380,150)">
+            <path d="M50 0 L 100 18 V 70 C 100 95, 75 115, 50 130 C 25 115, 0 95, 0 70 V 18 Z" fill="#0A6E6E" opacity=".2" stroke="#0A6E6E"/>
+            <path d="M30 65 L 45 80 L 75 50" stroke="#0A6E6E" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+
+          <text x="430" y="320" font-family="Fraunces" font-size="14" fill="#fff" text-anchor="middle">Encryption · AES-256</text>
+          <text x="430" y="345" font-family="Fraunces" font-size="14" fill="#fff" text-anchor="middle">Pseudonymisation</text>
+          <text x="430" y="370" font-family="Fraunces" font-size="14" fill="#fff" text-anchor="middle">OKTA Identity Token</text>
+          <line x1="350" y1="385" x2="510" y2="385" stroke="#3a3d44"/>
+          <text x="430" y="410" font-family="JetBrains Mono" font-size="9" letter-spacing="1" fill="#9c9588" text-anchor="middle">PII NEVER LEAVES THIS GATE</text>
+          <text x="430" y="430" font-family="JetBrains Mono" font-size="9" letter-spacing="1" fill="#9c9588" text-anchor="middle">EXCEPT TO THE PATIENT</text>
+          <text x="430" y="450" font-family="JetBrains Mono" font-size="9" letter-spacing="1" fill="#9c9588" text-anchor="middle">THEMSELVES</text>
+
+          <!-- Arrow to stores -->
+          <path d="M540 220 L 600 180" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+          <path d="M540 340 L 600 380" stroke="#0A6E6E" stroke-width="2" fill="none" marker-end="url(#arrowT)"/>
+
+          <!-- Zone 3a: PERSONAL VAULT -->
+          <rect x="600" y="100" width="280" height="180" rx="14" fill="url(#zone-app)" stroke="#1416151A"/>
+          <text x="620" y="128" font-family="JetBrains Mono" font-size="10" letter-spacing="2" fill="#A91410">PERSONAL VAULT</text>
+          <text x="620" y="148" font-family="Fraunces" font-size="13" fill="#14161B" font-style="italic">small · encrypted · restricted</text>
+
+          <!-- vault icon -->
+          <g transform="translate(620,170)">
+            <rect width="50" height="60" rx="6" fill="#fff" stroke="#14161B"/>
+            <circle cx="25" cy="30" r="10" fill="none" stroke="#14161B" stroke-width="2"/>
+            <line x1="25" y1="30" x2="25" y2="42" stroke="#14161B" stroke-width="2"/>
+          </g>
+          <g font-family="DM Sans" font-size="10" fill="#14161B">
+            <text x="685" y="190">Patient-identifiable record</text>
+            <text x="685" y="210" fill="#8A8478">→ Identity, contact, dose schedule</text>
+            <text x="685" y="232">Access: Patient + auto-services only</text>
+            <text x="685" y="252" fill="#8A8478">No human at Takeda reads this</text>
+          </g>
+
+          <!-- Zone 3b: PSEUDO LAKE -->
+          <rect x="600" y="300" width="280" height="180" rx="14" fill="url(#zone-analytics)" stroke="#0A6E6E33"/>
+          <text x="620" y="328" font-family="JetBrains Mono" font-size="10" letter-spacing="2" fill="#0A6E6E">PSEUDONYMISED LAKE</text>
+          <text x="620" y="348" font-family="Fraunces" font-size="13" fill="#14161B" font-style="italic">events · without faces</text>
+
+          <!-- lake icon -->
+          <g transform="translate(620,370)">
+            <ellipse cx="25" cy="40" rx="22" ry="6" fill="#0A6E6E" opacity=".4"/>
+            <ellipse cx="25" cy="30" rx="22" ry="6" fill="#0A6E6E" opacity=".6"/>
+            <ellipse cx="25" cy="20" rx="22" ry="6" fill="#0A6E6E" opacity=".8"/>
+            <ellipse cx="25" cy="10" rx="22" ry="6" fill="#0A6E6E"/>
+          </g>
+          <g font-family="DM Sans" font-size="10" fill="#14161B">
+            <text x="685" y="380">All event streams (anon. user_id)</text>
+            <text x="685" y="400" fill="#8A8478">→ adherence, persistence, refills</text>
+            <text x="685" y="422">Access: Analytics + Research</text>
+            <text x="685" y="442" fill="#8A8478">Aggregated for reports &amp; pubs</text>
+          </g>
+
+          <!-- Pharmacy refill external -->
+          <g>
+            <rect x="600" y="500" width="280" height="40" rx="8" fill="#fff" stroke="#1416151A" stroke-dasharray="4 3"/>
+            <circle cx="624" cy="520" r="8" fill="#0A6E6E"/>
+            <path d="M620 520 l3 3 l5 -6" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <text x="640" y="516" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#0A6E6E">EXTERNAL · OPT-IN</text>
+            <text x="640" y="530" font-family="DM Sans" font-size="10" fill="#14161B">Pharmacy refill records</text>
+          </g>
+          <path d="M740 500 L 740 480" stroke="#0A6E6E" stroke-width="2" stroke-dasharray="4 3" fill="none" marker-end="url(#arrowT)"/>
+
+          <!-- Arrows to outputs -->
+          <path d="M880 190 L 940 230" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+          <path d="M880 390 L 940 350" stroke="#0A6E6E" stroke-width="2" fill="none" marker-end="url(#arrowT)"/>
+          <path d="M880 390 L 940 430" stroke="#0A6E6E" stroke-width="2" fill="none" marker-end="url(#arrowT)"/>
+
+          <!-- Zone 4: OUTPUTS -->
+          <rect x="940" y="60" width="280" height="440" rx="14" fill="url(#zone-output)" stroke="#B88A3E33"/>
+          <text x="960" y="90" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#7A5C28">CONSUMERS · OUTPUTS</text>
+          <text x="960" y="110" font-family="Fraunces" font-size="14" fill="#14161B" font-style="italic">each sees only what they should</text>
+
+          <!-- Patient -->
+          <g transform="translate(960,140)">
+            <rect width="240" height="80" rx="8" fill="#fff" stroke="#1416151A"/>
+            <circle cx="22" cy="40" r="14" fill="#FFF1EF" stroke="#E2231A"/>
+            <text x="22" y="44" font-family="DM Sans" font-size="11" font-weight="600" fill="#E2231A" text-anchor="middle">P</text>
+            <text x="48" y="32" font-family="Fraunces" font-size="13" fill="#14161B">Patient</text>
+            <text x="48" y="48" font-family="DM Sans" font-size="9" fill="#8A8478">Their own data, in plain language</text>
+            <text x="48" y="64" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#0A6E6E">FULL ACCESS · IDENTIFIABLE</text>
+          </g>
+
+          <!-- HCP -->
+          <g transform="translate(960,235)">
+            <rect width="240" height="80" rx="8" fill="#fff" stroke="#1416151A"/>
+            <circle cx="22" cy="40" r="14" fill="#E9F4F4" stroke="#0A6E6E"/>
+            <text x="22" y="44" font-family="DM Sans" font-size="11" font-weight="600" fill="#0A6E6E" text-anchor="middle">H</text>
+            <text x="48" y="32" font-family="Fraunces" font-size="13" fill="#14161B">HCP</text>
+            <text x="48" y="48" font-family="DM Sans" font-size="9" fill="#8A8478">Pre-visit summary, only with consent</text>
+            <text x="48" y="64" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#B88A3E">SCOPED · CONSENTED</text>
+          </g>
+
+          <!-- Internal Analytics -->
+          <g transform="translate(960,330)">
+            <rect width="240" height="80" rx="8" fill="#fff" stroke="#1416151A"/>
+            <circle cx="22" cy="40" r="14" fill="#F4ECD8" stroke="#B88A3E"/>
+            <text x="22" y="44" font-family="DM Sans" font-size="11" font-weight="600" fill="#B88A3E" text-anchor="middle">A</text>
+            <text x="48" y="32" font-family="Fraunces" font-size="13" fill="#14161B">Takeda Analytics &amp; LOC</text>
+            <text x="48" y="48" font-family="DM Sans" font-size="9" fill="#8A8478">Aggregate cohort metrics only</text>
+            <text x="48" y="64" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#0A6E6E">AGGREGATE · ANONYMOUS</text>
+          </g>
+
+          <!-- Research / Evidence -->
+          <g transform="translate(960,425)">
+            <rect width="240" height="60" rx="8" fill="#fff" stroke="#1416151A"/>
+            <circle cx="22" cy="30" r="14" fill="#EADFBF" stroke="#7A5C28"/>
+            <text x="22" y="34" font-family="DM Sans" font-size="11" font-weight="600" fill="#7A5C28" text-anchor="middle">R</text>
+            <text x="48" y="26" font-family="Fraunces" font-size="13" fill="#14161B">Evidence &amp; Research</text>
+            <text x="48" y="42" font-family="DM Sans" font-size="9" fill="#8A8478">Pseudonymous cohort, registry-grade</text>
+            <text x="48" y="55" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#0A6E6E">PSEUDONYMOUS · GOVERNED</text>
+          </g>
+        </svg>
+        <div class="flow-legend">
+          <div class="leg-item"><span class="leg-swatch" style="background:#FFF1EF;border:1px solid #F4A09B"></span> Patient zone — identifiable</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#14161B"></span> Secure gateway — encrypted &amp; tokenised</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#E9F4F4;border:1px solid #0A6E6E33"></span> Pseudonymised — events without faces</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#F4ECD8;border:1px solid #B88A3E33"></span> Output — scoped to audience</div>
+          <div class="leg-item"><span class="leg-swatch" style="border:1px dashed #0A6E6E"></span> External · opt-in only</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="privacy">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">Who sees what</div>
+          <h3 style="margin-top:.5rem">Privacy is a design choice, not a footnote.</h3>
+        </div>
+      </div>
+      <div class="priv-grid">
+        <div class="priv-table">
+          <table>
+            <thead><tr><th>Role</th><th>Identifiable</th><th>Pseudonymous</th><th>Aggregate</th></tr></thead>
+            <tbody>
+              <tr><td class="who">Patient (themselves)</td><td class="access-yes">✓ Full</td><td>—</td><td>—</td></tr>
+              <tr><td class="who">HCP (with consent)</td><td class="access-aggr">Scoped summary</td><td class="access-no">—</td><td class="access-yes">✓</td></tr>
+              <tr><td class="who">LOC business team</td><td class="access-no">Never</td><td class="access-no">Never</td><td class="access-yes">✓</td></tr>
+              <tr><td class="who">Analytics &amp; Evidence</td><td class="access-no">Never</td><td class="access-yes">✓ Governed</td><td class="access-yes">✓</td></tr>
+              <tr><td class="who">Engineering / Ops</td><td class="access-no">Never (services only)</td><td class="access-no">Audit logs only</td><td class="access-no">—</td></tr>
+              <tr><td class="who">External research partner</td><td class="access-no">Never</td><td class="access-aggr">Cohort, on contract</td><td class="access-yes">✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="priv-promise">
+          <div class="eyebrow">Our promise</div>
+          <h4>The patient is the only person who ever sees their own data with a name on it.</h4>
+          <ul>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              <span><strong>Encryption everywhere.</strong> AES-256 at rest. TLS 1.3 in transit. Keys rotated.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <span><strong>Pseudonymisation by default.</strong> Identity is replaced with a token before any analytics layer sees the event.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M12 15v3"/><circle cx="12" cy="12" r="9"/><path d="M12 7v4"/></svg>
+              <span><strong>Consent is granular.</strong> Pharmacy linkage, HCP sharing, research participation — three separate toggles.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M3 6h18M8 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 11v6M14 11v6"/></svg>
+              <span><strong>Right to delete.</strong> One tap removes the identifiable record; pseudonymous events are retained for audit only.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOC VALUE -->
+    <div class="loc">
+      <div class="loc-header">
+        <div class="eyebrow">Why a LOC will say yes</div>
+        <h3>One evidence, three windows.</h3>
+      </div>
+      <div class="loc-grid">
+        <div class="loc-card care">
+          <div class="loc-num">01</div>
+          <div class="loc-cat">Patient Care</div>
+          <h4>Patients arrive at week 16 still on therapy.</h4>
+          <p>Adherence is the single biggest predictor of clinical response in psoriasis biologics. Habit, captured early, is the lever.</p>
+          <div class="metric">
+            <div class="v">+22 pts</div>
+            <div class="l">Target adherence lift vs. SoC</div>
+          </div>
+        </div>
+        <div class="loc-card tech">
+          <div class="loc-num">02</div>
+          <div class="loc-cat">Data &amp; Tech</div>
+          <h4>A reusable adherence telemetry layer.</h4>
+          <p>Event schema and pharmacy connectors built once, applied across future Takeda DHPs. The platform compounds.</p>
+          <div class="metric">
+            <div class="v">7</div>
+            <div class="l">Reusable adherence events</div>
+          </div>
+        </div>
+        <div class="loc-card biz">
+          <div class="loc-num">03</div>
+          <div class="loc-cat">Business</div>
+          <h4>Evidence the LOC can take to a payer table.</h4>
+          <p>Real-world adherence + refill anchors → the foundation of a value conversation, even before formal value-based contracts.</p>
+          <div class="metric">
+            <div class="v">12–16w</div>
+            <div class="l">First credible read-out</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE STORY -->
+    <div class="story">
+      <div class="story-intro">
+        <div class="label">
+          <div class="big">The<br>Story</div>
+          <div class="sub">E1 · From first dose to lasting habit</div>
+        </div>
+        <div>
+          <p class="lead">
+            Lina, 34, started on therapy in January. By March, fewer than half of patients like her would still be taking it. <strong>This is what Pso Mate sees in her data — and what we do with it.</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- TIMELINE -->
+      <div class="timeline">
+        <div class="timeline-track"></div>
+        <div class="timeline-grid">
+          <div class="tl-node">
+            <div class="tl-position">Day 1</div>
+            <div class="dot">01</div>
+            <div class="tl-card">
+              <div class="lbl">Onboarding</div>
+              <div class="val">100<span class="unit">%</span></div>
+              <div class="desc">Setup completed in 6 minutes. Consent given for HCP sharing.</div>
+            </div>
+          </div>
+          <div class="tl-node">
+            <div class="tl-position">Week 1–2</div>
+            <div class="dot">02</div>
+            <div class="tl-card">
+              <div class="lbl">Reminder taps</div>
+              <div class="val">87<span class="unit">%</span></div>
+              <div class="desc">Strong intent. The habit is forming. We send less.</div>
+            </div>
+          </div>
+          <div class="tl-node">
+            <div class="tl-position">Week 4</div>
+            <div class="dot">03</div>
+            <div class="tl-card">
+              <div class="lbl">Friday dip</div>
+              <div class="val">↓ 18<span class="unit">%</span></div>
+              <div class="desc">Two missed Friday doses. App quietly nudges Thursday night.</div>
+            </div>
+          </div>
+          <div class="tl-node">
+            <div class="tl-position">Week 12</div>
+            <div class="dot">04</div>
+            <div class="tl-card">
+              <div class="lbl">Persistence</div>
+              <div class="val">82<span class="unit">%</span></div>
+              <div class="desc">Adherence holds. Pharmacy refill confirms what the app saw.</div>
+            </div>
+          </div>
+          <div class="tl-node">
+            <div class="tl-position">Week 16+</div>
+            <div class="dot">05</div>
+            <div class="tl-card">
+              <div class="lbl">vs. SoC</div>
+              <div class="val">+24<span class="unit">pts</span></div>
+              <div class="desc">Cohort persistence vs. published Standard of Care benchmark.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="insight-box">
+        <div>
+          <div class="lbl">The thread</div>
+          <h4>Onboarding predicts behaviour. Behaviour predicts outcomes.</h4>
+        </div>
+        <div class="quote">
+          A six-minute setup on day one is the strongest single signal we have for whether a patient will still be on therapy at week sixteen — and Pso Mate is the only place that signal lives.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= E2: SYMPTOM TRACKING ============= -->
+<section class="ev-section alt" id="e2">
+  <div class="container-wide">
+    <div class="ev-header">
+      <div>
+        <div class="ev-mega">E2</div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:1rem">Evidence Two · Symptom Tracking &amp; Visit Readiness</div>
+        <p class="ev-claim">
+          We claim that structured tracking <em>turns vague memory into a clear conversation</em> —
+          measured by patient confidence and HCP-rated visit quality.
+        </p>
+      </div>
+    </div>
+
+    <!-- DATA POINTS -->
+    <div class="datapoints">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">What we collect</div>
+          <h3 style="margin-top:.5rem">Eight data points that turn a daily life into a visit-ready story.</h3>
+        </div>
+        <div class="mono" style="color:var(--grey)">Curated from E2 superset</div>
+      </div>
+      <div class="dp-grid">
+        <div class="dp">
+          <span class="badge">Patient-reported</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="6"/></svg></div>
+          <h4>Itch score</h4>
+          <p>0–10 daily Likert scale. Captures the symptom that defines the patient's day.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Patient-reported</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+          <h4>Sleep quality</h4>
+          <p>Hours + 1–5 disturbance score. The first proxy for nocturnal scratching.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Patient-reported</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M3 12s4-8 9-8 9 8 9 8-4 8-9 8-9-8-9-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h4>Flare logging</h4>
+          <p>Onset, location, severity. Builds the longitudinal flare timeline.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Patient-reported</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M5 17a4 4 0 0 1 0-8 5 5 0 0 1 9-3 4 4 0 0 1 3 11"/></svg></div>
+          <h4>Trigger tags</h4>
+          <p>Stress, weather, food, lifestyle. Free-tag plus structured options.</p>
+        </div>
+        <div class="dp">
+          <span class="badge">Patient-reported</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2"><path d="M12 2C8 7 5 11 5 14a7 7 0 0 0 14 0c0-3-3-7-7-12z"/></svg></div>
+          <h4>High-impact site</h4>
+          <p>Hands, scalp, face, genitals. A patient-defined "this is what bothers me most."</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">Visual</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/><path d="M8 6l1-3h6l1 3"/></svg></div>
+          <h4>Photo journal</h4>
+          <p>Guided capture, optional. Side-by-side compare across weeks. No AI claim in MVP.</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">Derived</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div>
+          <h4>Pattern signal</h4>
+          <p>Itch ↔ sleep ↔ trigger correlations surfaced over rolling 4-week windows.</p>
+        </div>
+        <div class="dp passive">
+          <span class="badge">Output</span>
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <h4>30-second visit summary</h4>
+          <p>The artefact the HCP actually reads. Trends, triggers, photos, top concern.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA FLOW -->
+    <div class="flow-wrap">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">How the data moves</div>
+          <h3 style="margin-top:.5rem">From scattered moments to one coherent summary.</h3>
+        </div>
+        <div class="mono" style="color:var(--grey)">E2 Data Flow · Reference</div>
+      </div>
+      <div class="flow-card">
+        <svg viewBox="0 0 1240 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="zone-user2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFF1EF"/>
+              <stop offset="100%" stop-color="#FCE3DF"/>
+            </linearGradient>
+            <linearGradient id="zone-photo" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#F4ECD8"/>
+              <stop offset="100%" stop-color="#EADFBF"/>
+            </linearGradient>
+            <linearGradient id="zone-engine" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1A2027"/>
+              <stop offset="100%" stop-color="#14161B"/>
+            </linearGradient>
+            <linearGradient id="zone-out2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E9F4F4"/>
+              <stop offset="100%" stop-color="#D4ECEC"/>
+            </linearGradient>
+            <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#14161B"/>
+            </marker>
+            <marker id="arrowR2" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+              <path d="M0,0 L8,3 L0,6 Z" fill="#E2231A"/>
+            </marker>
+          </defs>
+
+          <!-- INPUTS LEFT -->
+          <text x="40" y="40" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#A91410">PATIENT INPUTS · DAILY MOMENTS</text>
+
+          <!-- input cards -->
+          <g>
+            <rect x="20" y="60" width="240" height="55" rx="10" fill="url(#zone-user2)" stroke="#F4A09B"/>
+            <circle cx="50" cy="87" r="14" fill="#fff" stroke="#E2231A"/>
+            <text x="50" y="91" font-family="DM Sans" font-size="10" font-weight="600" fill="#E2231A" text-anchor="middle">I</text>
+            <text x="78" y="84" font-family="Fraunces" font-size="14" fill="#14161B">Itch · Sleep · Mood</text>
+            <text x="78" y="100" font-family="DM Sans" font-size="10" fill="#8A8478">Daily Likert · 30 sec entry</text>
+          </g>
+          <g>
+            <rect x="20" y="130" width="240" height="55" rx="10" fill="url(#zone-user2)" stroke="#F4A09B"/>
+            <circle cx="50" cy="157" r="14" fill="#fff" stroke="#E2231A"/>
+            <text x="50" y="161" font-family="DM Sans" font-size="10" font-weight="600" fill="#E2231A" text-anchor="middle">F</text>
+            <text x="78" y="154" font-family="Fraunces" font-size="14" fill="#14161B">Flare events</text>
+            <text x="78" y="170" font-family="DM Sans" font-size="10" fill="#8A8478">Onset, body site, severity</text>
+          </g>
+          <g>
+            <rect x="20" y="200" width="240" height="55" rx="10" fill="url(#zone-user2)" stroke="#F4A09B"/>
+            <circle cx="50" cy="227" r="14" fill="#fff" stroke="#E2231A"/>
+            <text x="50" y="231" font-family="DM Sans" font-size="10" font-weight="600" fill="#E2231A" text-anchor="middle">T</text>
+            <text x="78" y="224" font-family="Fraunces" font-size="14" fill="#14161B">Trigger tags</text>
+            <text x="78" y="240" font-family="DM Sans" font-size="10" fill="#8A8478">Stress, weather, diet, lifestyle</text>
+          </g>
+          <g>
+            <rect x="20" y="270" width="240" height="55" rx="10" fill="url(#zone-photo)" stroke="#B88A3E"/>
+            <circle cx="50" cy="297" r="14" fill="#fff" stroke="#7A5C28"/>
+            <text x="50" y="301" font-family="DM Sans" font-size="10" font-weight="600" fill="#7A5C28" text-anchor="middle">P</text>
+            <text x="78" y="294" font-family="Fraunces" font-size="14" fill="#14161B">Photo journal</text>
+            <text x="78" y="310" font-family="DM Sans" font-size="10" fill="#8A8478">Guided · optional · sensitive</text>
+          </g>
+          <g>
+            <rect x="20" y="340" width="240" height="55" rx="10" fill="url(#zone-user2)" stroke="#F4A09B"/>
+            <circle cx="50" cy="367" r="14" fill="#fff" stroke="#E2231A"/>
+            <text x="50" y="371" font-family="DM Sans" font-size="10" font-weight="600" fill="#E2231A" text-anchor="middle">Q</text>
+            <text x="78" y="364" font-family="Fraunces" font-size="14" fill="#14161B">High-impact site</text>
+            <text x="78" y="380" font-family="DM Sans" font-size="10" fill="#8A8478">"What bothers you most this week?"</text>
+          </g>
+          <g>
+            <rect x="20" y="410" width="240" height="55" rx="10" fill="url(#zone-user2)" stroke="#F4A09B"/>
+            <circle cx="50" cy="437" r="14" fill="#fff" stroke="#E2231A"/>
+            <text x="50" y="441" font-family="DM Sans" font-size="10" font-weight="600" fill="#E2231A" text-anchor="middle">C</text>
+            <text x="78" y="434" font-family="Fraunces" font-size="14" fill="#14161B">Confidence check-in</text>
+            <text x="78" y="450" font-family="DM Sans" font-size="10" fill="#8A8478">Pre/post-visit Likert (5 pt)</text>
+          </g>
+
+          <!-- arrows merging -->
+          <path d="M260 88 C 320 88, 340 240, 380 280" stroke="#14161B" stroke-width="1.5" fill="none" opacity=".6"/>
+          <path d="M260 158 C 320 158, 340 240, 380 280" stroke="#14161B" stroke-width="1.5" fill="none" opacity=".6"/>
+          <path d="M260 228 C 320 228, 340 240, 380 280" stroke="#14161B" stroke-width="1.5" fill="none" opacity=".6"/>
+          <path d="M260 297 C 320 297, 340 280, 380 280" stroke="#7A5C28" stroke-width="1.5" stroke-dasharray="4 3" fill="none" opacity=".7"/>
+          <path d="M260 367 C 320 367, 340 280, 380 280" stroke="#14161B" stroke-width="1.5" fill="none" opacity=".6"/>
+          <path d="M260 437 C 320 437, 340 280, 380 280" stroke="#14161B" stroke-width="1.5" fill="none" opacity=".6"/>
+
+          <!-- ENCRYPT GATE -->
+          <rect x="380" y="220" width="180" height="120" rx="14" fill="url(#zone-engine)"/>
+          <text x="470" y="248" font-family="JetBrains Mono" font-size="9" letter-spacing="1.5" fill="#cfc8b8" text-anchor="middle">SECURE GATEWAY</text>
+          <g transform="translate(440,265)">
+            <path d="M30 0 L 60 12 V 42 C 60 56, 45 68, 30 76 C 15 68, 0 56, 0 42 V 12 Z" fill="#0A6E6E" opacity=".25" stroke="#0A6E6E"/>
+            <path d="M16 38 L 26 48 L 46 28" stroke="#0A6E6E" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+
+          <!-- arrow to engine -->
+          <path d="M560 280 L 600 280" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+          <!-- PHOTO LOCAL OPTION callout -->
+          <g>
+            <rect x="380" y="380" width="180" height="50" rx="8" fill="#fff" stroke="#B88A3E" stroke-dasharray="4 3"/>
+            <text x="470" y="400" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#7A5C28" text-anchor="middle">PHOTO · OPTIONAL PATH</text>
+            <text x="470" y="418" font-family="DM Sans" font-size="10" fill="#14161B" text-anchor="middle">Local-only or encrypted upload</text>
+          </g>
+
+          <!-- PATTERN ENGINE -->
+          <rect x="600" y="120" width="280" height="320" rx="14" fill="#fff" stroke="#1416151A"/>
+          <text x="620" y="148" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#A91410">PATTERN ENGINE</text>
+          <text x="620" y="170" font-family="Fraunces" font-size="14" fill="#14161B" font-style="italic">where moments become a story</text>
+
+          <!-- engine internals -->
+          <g font-family="DM Sans" font-size="11" fill="#14161B">
+            <rect x="620" y="190" width="240" height="40" rx="6" fill="#FFF1EF"/>
+            <text x="640" y="215">→ Rolling 4-week trend windows</text>
+            <rect x="620" y="240" width="240" height="40" rx="6" fill="#FFF1EF"/>
+            <text x="640" y="265">→ Itch × sleep × trigger correlation</text>
+            <rect x="620" y="290" width="240" height="40" rx="6" fill="#FFF1EF"/>
+            <text x="640" y="315">→ High-impact site change detection</text>
+            <rect x="620" y="340" width="240" height="40" rx="6" fill="#FFF1EF"/>
+            <text x="640" y="365">→ Visit-prep summary generation</text>
+          </g>
+          <text x="740" y="410" font-family="JetBrains Mono" font-size="8" letter-spacing="1.2" fill="#8A8478" text-anchor="middle">PSEUDONYMOUS · NO PII LEAVES</text>
+
+          <!-- arrows to outputs -->
+          <path d="M880 220 L 940 180" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+          <path d="M880 320 L 940 320" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+          <path d="M880 380 L 940 440" stroke="#14161B" stroke-width="2" fill="none" marker-end="url(#arrow2)"/>
+
+          <!-- OUTPUTS -->
+          <rect x="940" y="100" width="280" height="440" rx="14" fill="url(#zone-out2)" stroke="#0A6E6E33"/>
+          <text x="960" y="128" font-family="JetBrains Mono" font-size="11" letter-spacing="2" fill="#0A6E6E">CONSUMERS · OUTPUTS</text>
+
+          <!-- patient -->
+          <g transform="translate(960,150)">
+            <rect width="240" height="100" rx="8" fill="#fff" stroke="#1416151A"/>
+            <text x="20" y="28" font-family="Fraunces" font-size="14" fill="#14161B">Patient</text>
+            <text x="20" y="48" font-family="DM Sans" font-size="10" fill="#8A8478">In-app insight cards</text>
+            <text x="20" y="68" font-family="DM Sans" font-size="10" fill="#14161B">"Your itch was worst on stressful</text>
+            <text x="20" y="82" font-family="DM Sans" font-size="10" fill="#14161B">days. Sleep dropped 1.4 hours."</text>
+            <text x="20" y="96" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#0A6E6E">FULL ACCESS · IDENTIFIABLE</text>
+          </g>
+
+          <!-- HCP -->
+          <g transform="translate(960,260)">
+            <rect width="240" height="120" rx="8" fill="#fff" stroke="#1416151A"/>
+            <text x="20" y="28" font-family="Fraunces" font-size="14" fill="#14161B">HCP — pre-visit summary</text>
+            <text x="20" y="48" font-family="DM Sans" font-size="10" fill="#8A8478">30-second read · with consent</text>
+            <text x="20" y="68" font-family="DM Sans" font-size="10" fill="#14161B">• Itch trend · Triggers · Photos</text>
+            <text x="20" y="82" font-family="DM Sans" font-size="10" fill="#14161B">• Top concern · Adherence flag</text>
+            <text x="20" y="96" font-family="DM Sans" font-size="10" fill="#14161B">• "What's changed since last visit"</text>
+            <text x="20" y="115" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#B88A3E">SCOPED · CONSENTED</text>
+          </g>
+
+          <!-- internal -->
+          <g transform="translate(960,390)">
+            <rect width="240" height="80" rx="8" fill="#fff" stroke="#1416151A"/>
+            <text x="20" y="28" font-family="Fraunces" font-size="14" fill="#14161B">Takeda &amp; LOC</text>
+            <text x="20" y="48" font-family="DM Sans" font-size="10" fill="#8A8478">Aggregate cohort patterns</text>
+            <text x="20" y="65" font-family="DM Sans" font-size="10" fill="#14161B">Trigger frequency, site distribution</text>
+            <text x="20" y="78" font-family="JetBrains Mono" font-size="7" letter-spacing="1" fill="#0A6E6E">AGGREGATE · ANONYMOUS</text>
+          </g>
+
+          <!-- evidence -->
+          <g transform="translate(960,480)">
+            <rect width="240" height="50" rx="8" fill="#fff" stroke="#1416151A"/>
+            <text x="20" y="22" font-family="Fraunces" font-size="13" fill="#14161B">Evidence &amp; KOL outputs</text>
+            <text x="20" y="38" font-family="DM Sans" font-size="9" fill="#8A8478">Pseudonymous, governed cohort</text>
+          </g>
+
+          <!-- bottom legend -->
+          <g transform="translate(40,520)">
+            <text font-family="JetBrains Mono" font-size="8" letter-spacing="1.2" fill="#8A8478">PHOTO POLICY · ALWAYS OPT-IN · LOCAL-FIRST AVAILABLE · NO SHARING WITHOUT EXPLICIT CONSENT</text>
+          </g>
+        </svg>
+        <div class="flow-legend">
+          <div class="leg-item"><span class="leg-swatch" style="background:#FFF1EF;border:1px solid #F4A09B"></span> Patient self-report</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#F4ECD8;border:1px solid #B88A3E"></span> Photo — special handling</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#14161B"></span> Secure gateway</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#fff;border:1px solid #1416151A"></span> Pattern engine — pseudonymous</div>
+          <div class="leg-item"><span class="leg-swatch" style="background:#E9F4F4;border:1px solid #0A6E6E33"></span> Output — scoped to audience</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="privacy">
+      <div class="dp-header">
+        <div>
+          <div class="eyebrow">Who sees what · special photo policy</div>
+          <h3 style="margin-top:.5rem">Photos are different. Our defaults reflect that.</h3>
+        </div>
+      </div>
+      <div class="priv-grid">
+        <div class="priv-table">
+          <table>
+            <thead><tr><th>Data</th><th>Default storage</th><th>Default sharing</th><th>Patient control</th></tr></thead>
+            <tbody>
+              <tr><td class="who">Symptom scores</td><td>Encrypted cloud</td><td class="access-aggr">HCP w/ consent</td><td class="access-yes">Granular toggle</td></tr>
+              <tr><td class="who">Triggers &amp; notes</td><td>Encrypted cloud</td><td class="access-aggr">HCP w/ consent</td><td class="access-yes">Granular toggle</td></tr>
+              <tr><td class="who">Photos</td><td>Local-first option</td><td class="access-no">No one by default</td><td class="access-yes">Per-photo decision</td></tr>
+              <tr><td class="who">Visit summary</td><td>Generated on demand</td><td class="access-aggr">HCP only</td><td class="access-yes">Preview &amp; redact</td></tr>
+              <tr><td class="who">Pattern insights</td><td>Pseudonymous</td><td class="access-no">Internal only</td><td class="access-yes">Opt-out research</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="priv-promise">
+          <div class="eyebrow">Photo policy · the third toggle</div>
+          <h4>Patients should never have to wonder where their photo went.</h4>
+          <ul>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="4"/></svg>
+              <span><strong>Local-first by default.</strong> Photos can stay on the device until the patient explicitly chooses to share.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+              <span><strong>Per-photo consent.</strong> "Share with my doctor for my next visit" — one tap, one photo, one expiry.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M3 6h18M8 6v14a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6"/></svg>
+              <span><strong>Auto-expiry.</strong> Shared photos auto-revoke after the visit window closes — patient can extend if they want.</span>
+            </li>
+            <li>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A6E6E" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+              <span><strong>No AI claim.</strong> MVP photo journal is a journal, not a diagnostic. The label is honest.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOC VALUE -->
+    <div class="loc">
+      <div class="loc-header">
+        <div class="eyebrow">Why a LOC will say yes</div>
+        <h3>One evidence, three windows.</h3>
+      </div>
+      <div class="loc-grid">
+        <div class="loc-card care">
+          <div class="loc-num">01</div>
+          <div class="loc-cat">Patient Care</div>
+          <h4>Visits go from "how have you been" to "let's talk about your trigger pattern."</h4>
+          <p>HCPs walk into the room already informed. Patients feel heard. Decisions get made faster.</p>
+          <div class="metric">
+            <div class="v">−4 min</div>
+            <div class="l">Target time-to-decision in visit</div>
+          </div>
+        </div>
+        <div class="loc-card tech">
+          <div class="loc-num">02</div>
+          <div class="loc-cat">Data &amp; Tech</div>
+          <h4>A symptom &amp; trigger ontology that survives the product.</h4>
+          <p>Structured tags + free-text become a reusable schema for any chronic, symptom-driven condition Takeda touches.</p>
+          <div class="metric">
+            <div class="v">8</div>
+            <div class="l">Reusable structured signals</div>
+          </div>
+        </div>
+        <div class="loc-card biz">
+          <div class="loc-num">03</div>
+          <div class="loc-cat">Business</div>
+          <h4>HCP advocacy, the cheapest channel we have.</h4>
+          <p>An HCP who says "this saved me time" sells more strongly than any sales aid. Visit summaries make the case for them.</p>
+          <div class="metric">
+            <div class="v">≥ 70%</div>
+            <div class="l">Target HCP "useful" rating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- THE STORY -->
+    <div class="story">
+      <div class="story-intro">
+        <div class="label">
+          <div class="big">The<br>Story</div>
+          <div class="sub">E2 · The hidden chain</div>
+        </div>
+        <div>
+          <p class="lead">
+            Lina doesn't think her flares connect. She knows Tuesdays were bad. She knows last
+            month was hard. <strong>But she doesn't see what Pso Mate sees: the chain that runs
+            from a stressful workweek to a sleepless Wednesday to a flare on Friday morning.</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- WEB VISUALIZATION -->
+      <div class="web-section">
+        <div class="web-viz">
+          <svg viewBox="0 0 520 480" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="rg-stress" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#E2231A" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#E2231A" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="rg-itch" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#E2231A" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#E2231A" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="rg-sleep" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#0A6E6E" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#0A6E6E" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="rg-mood" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#B88A3E" stop-opacity=".18"/>
+                <stop offset="100%" stop-color="#B88A3E" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+
+            <!-- background -->
+            <rect width="520" height="480" fill="#FAF7F2"/>
+
+            <!-- glow halos -->
+            <circle cx="260" cy="100" r="80" fill="url(#rg-stress)"/>
+            <circle cx="120" cy="240" r="80" fill="url(#rg-itch)"/>
+            <circle cx="400" cy="240" r="80" fill="url(#rg-sleep)"/>
+            <circle cx="260" cy="380" r="80" fill="url(#rg-mood)"/>
+
+            <!-- connecting lines (chain) -->
+            <path d="M260 130 Q 200 180 150 220" stroke="#E2231A" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+            <path d="M150 270 Q 270 320 360 270" stroke="#0A6E6E" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+            <path d="M380 280 Q 320 340 280 360" stroke="#B88A3E" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+            <path d="M240 360 Q 180 320 150 270" stroke="#E2231A" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity=".5"/>
+            <path d="M285 350 Q 320 250 280 130" stroke="#B88A3E" stroke-width="2" fill="none" stroke-dasharray="4 4" opacity=".5"/>
+
+            <!-- nodes -->
+            <!-- Stress -->
+            <g>
+              <circle cx="260" cy="100" r="50" fill="#fff" stroke="#E2231A" stroke-width="2"/>
+              <text x="260" y="98" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#A91410" text-anchor="middle">TRIGGER</text>
+              <text x="260" y="115" font-family="Fraunces" font-size="16" fill="#14161B" text-anchor="middle" font-weight="500">Work stress</text>
+            </g>
+            <!-- Itch -->
+            <g>
+              <circle cx="120" cy="240" r="50" fill="#fff" stroke="#E2231A" stroke-width="2"/>
+              <text x="120" y="237" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#A91410" text-anchor="middle">SYMPTOM</text>
+              <text x="120" y="254" font-family="Fraunces" font-size="18" fill="#14161B" text-anchor="middle" font-weight="500">Itch ↑</text>
+            </g>
+            <!-- Sleep -->
+            <g>
+              <circle cx="400" cy="240" r="50" fill="#fff" stroke="#0A6E6E" stroke-width="2"/>
+              <text x="400" y="237" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#0A6E6E" text-anchor="middle">PROXY</text>
+              <text x="400" y="254" font-family="Fraunces" font-size="18" fill="#14161B" text-anchor="middle" font-weight="500">Sleep ↓</text>
+            </g>
+            <!-- Mood -->
+            <g>
+              <circle cx="260" cy="380" r="50" fill="#fff" stroke="#B88A3E" stroke-width="2"/>
+              <text x="260" y="377" font-family="JetBrains Mono" font-size="8" letter-spacing="1" fill="#7A5C28" text-anchor="middle">DOWNSTREAM</text>
+              <text x="260" y="394" font-family="Fraunces" font-size="18" fill="#14161B" text-anchor="middle" font-weight="500">Mood ↓</text>
+            </g>
+
+            <!-- center insight -->
+            <g>
+              <circle cx="260" cy="240" r="34" fill="#14161B"/>
+              <text x="260" y="235" font-family="JetBrains Mono" font-size="7" letter-spacing="1.2" fill="#cfc8b8" text-anchor="middle">PATTERN</text>
+              <text x="260" y="250" font-family="Fraunces" font-size="13" fill="#fff" text-anchor="middle" font-style="italic">found</text>
+            </g>
+
+            <!-- corner labels -->
+            <text x="40" y="40" font-family="JetBrains Mono" font-size="9" letter-spacing="1.2" fill="#8A8478">4-WEEK ROLLING WINDOW</text>
+            <text x="40" y="455" font-family="JetBrains Mono" font-size="9" letter-spacing="1.2" fill="#8A8478">CORRELATION · NOT CAUSATION</text>
+          </svg>
+        </div>
+
+        <div class="web-narrative">
+          <h4>How the data points connect into a story neither Lina nor her HCP could see alone.</h4>
+
+          <div class="narr-step">
+            <div class="nstep">01</div>
+            <div>
+              <h5>Monday — work stress logged</h5>
+              <p>Lina taps "stress" in the trigger tray after a hard meeting. Two minutes of input.</p>
+              <span class="data-tag">trigger.stress · day 0</span>
+            </div>
+          </div>
+
+          <div class="narr-step">
+            <div class="nstep">02</div>
+            <div>
+              <h5>Tuesday night — itch climbs to 7/10</h5>
+              <p>The next evening her itch score jumps. She doesn't connect it to yesterday — she's just uncomfortable.</p>
+              <span class="data-tag">itch.score · 7/10</span>
+            </div>
+          </div>
+
+          <div class="narr-step">
+            <div class="nstep">03</div>
+            <div>
+              <h5>Wednesday — sleep drops to 4.8 hours</h5>
+              <p>Self-reported sleep + disturbance score crater. The night was rough. By morning the link is invisible to her.</p>
+              <span class="data-tag">sleep.hours · 4.8</span>
+            </div>
+          </div>
+
+          <div class="narr-step">
+            <div class="nstep">04</div>
+            <div>
+              <h5>Thursday — mood check-in flags low</h5>
+              <p>She reports feeling drained. Pso Mate quietly notes: this is the third such cluster in four weeks.</p>
+              <span class="data-tag">mood.score · 2/5</span>
+            </div>
+          </div>
+
+          <div class="narr-step">
+            <div class="nstep">05</div>
+            <div>
+              <h5>Sunday — pattern surfaces</h5>
+              <p>The pattern engine names the chain Lina was living blind to. The insight goes into her visit summary <em>before</em> she sees the doctor.</p>
+              <span class="data-tag">pattern.detected · stress→itch→sleep→mood</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HCP SUMMARY MOCK -->
+      <div class="hcp-summary">
+        <div class="hcp-head">
+          <div class="left">
+            <div class="avatar">L</div>
+            <div class="who"><b>Lina M.</b> · 34F · Pso Mate user since Jan 8 · Visit in 5 days<br>
+              <span class="mono" style="color:var(--grey)">PRE-VISIT SUMMARY · GENERATED THIS MORNING</span>
+            </div>
+          </div>
+          <div class="stamp">⏱ 30 SEC READ</div>
+        </div>
+        <div class="hcp-grid">
+          <div class="hcp-stat">
+            <div class="l">Avg itch · 4 wks</div>
+            <div class="v">5.2</div>
+            <div class="t">↓ from 6.8</div>
+          </div>
+          <div class="hcp-stat">
+            <div class="l">Sleep avg</div>
+            <div class="v">5.9h</div>
+            <div class="t warn">↓ disturbed nights ↑</div>
+          </div>
+          <div class="hcp-stat">
+            <div class="l">Adherence</div>
+            <div class="v">82%</div>
+            <div class="t">on-track</div>
+          </div>
+          <div class="hcp-stat">
+            <div class="l">Top trigger</div>
+            <div class="v" style="font-size:1.2rem">Work stress</div>
+            <div class="t warn">3 of 4 weeks</div>
+          </div>
+        </div>
+        <div class="hcp-insight">
+          <div class="l">⚐ Pattern flagged for discussion</div>
+          <p>Lina's <strong>itch and sleep both worsen 24–48 hours after high-stress days</strong>. She doesn't see this connection. Her top concern this visit is <strong>scalp itch impacting work focus</strong>. Photos available on request — three captures over four weeks.</p>
+        </div>
+      </div>
+
+      <div class="insight-box" style="margin-top:3rem">
+        <div>
+          <div class="lbl">The thread</div>
+          <h4>Tracking is just the beginning. The story is the value.</h4>
+        </div>
+        <div class="quote">
+          Eight scattered data points become one sentence the HCP can act on in seconds — and a pattern Lina now understands about her own body.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= CLOSING / ASK ============= -->
+<section class="closing" id="ask">
+  <div class="container">
+    <div class="closing-grid">
+      <div>
+        <div class="eyebrow">03 · The ask</div>
+        <h2 class="display" style="margin-top:1rem">What we need from leadership.</h2>
+        <p style="margin-top:2rem; max-width:480px; color:var(--ink-soft); font-size:1.05rem">
+          E1 and E2 are <em style="font-family:Fraunces,serif">the foundation</em>. With endorsement on
+          these two, every other evidence (E3–E5) builds cleanly on top of the same data spine, the
+          same privacy posture, and the same story arc.
+        </p>
+      </div>
+      <div class="ask-list">
+        <div class="ask">
+          <div class="num">01</div>
+          <div>
+            <h5>Endorse the curated data set</h5>
+            <p>Seven E1 + eight E2 data points. Nothing more in the MVP. Each one earns its place by tying to a stakeholder claim.</p>
+          </div>
+        </div>
+        <div class="ask">
+          <div class="num">02</div>
+          <div>
+            <h5>Approve the privacy posture</h5>
+            <p>Pseudonymisation by default, granular consent (HCP, pharmacy, research as separate toggles), local-first photo handling.</p>
+          </div>
+        </div>
+        <div class="ask">
+          <div class="num">03</div>
+          <div>
+            <h5>Greenlight the LOC narrative</h5>
+            <p>Three-window framing — patient care, data &amp; tech, business — with measurable targets per window for the first 16-week read-out.</p>
+          </div>
+        </div>
+        <div class="ask">
+          <div class="num">04</div>
+          <div>
+            <h5>Commit to the story-led roll-out</h5>
+            <p>Every LOC and KOL conversation leads with a story (Lina's, or one like it) — never with a feature list. The data follows the narrative.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div style="font-family:Fraunces,serif; font-size:1.2rem; color:#fff">Pso Mate · Evidence Strategy</div>
+        <div class="mono" style="margin-top:.4rem">Internal · Working draft · Confidential</div>
+      </div>
+      <div class="mono">v2.0 · Prepared for Leadership Review</div>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
